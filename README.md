@@ -1,68 +1,111 @@
 <img width="1920" height="1080" alt="Screenshot (357)" src="https://github.com/user-attachments/assets/caf26d2e-58fb-48e7-a1aa-0d8d681c511a" />
 <img width="1920" height="1080" alt="Screenshot (358)" src="https://github.com/user-attachments/assets/c1883e37-923c-4ac9-b88b-68c118123cf7" />
 
-####Book-project-deployment-though docker ####
+📚 Book Project Deployment using Docker & AWS
 
-###👉  Create an Amazon RDS Instance  👉 Click “Create database”
+This guide explains how to deploy the Add Book Project using AWS RDS, EC2, and Docker.
 
-                                      👉 Choose a database engine -MySQL , full configuration
-                                            
-                                      👉 Choose version - MySQL 8.0.x
-                                       
-                                      👉 Choose a Template- Free tier (if eligible) , Dev/Test(Production)
-        
-                                      👉 Choose a Master username - admin 
-  
-                                      👉 Choose a Master password - self managed - Set a strong password.Confirm the password
+🚀 1. Create Amazon RDS (MySQL)
+👉 Steps:
 
-                                      👉 Configure Instance Size - db t3.micro
+Go to RDS Console → Click Create database
 
-                                      👉 Connectivity - vpc(default) , subnet group , security group
+Choose MySQL engine → Full configuration
 
-                                      👉 Choose a accessible - public
-                                      
-                                      👉 Choose Create Database 
+Version: MySQL 8.0.x
 
- 
- #👉 create ec2- docker-c7xi.large ,procced with keypair ,attach IAM role(ec2-fullaccess), security group
+Template: Free tier (if eligible) or Dev/Test
 
-  
- #👉 connect ec2    #👉 sudo su -
+Master username: admin
 
-                    #👉 yum install docker -y
+Master password: (your strong password)
 
-                    #👉 systemctl start docker
+Instance size: db.t3.micro
 
-                    #👉 systemctl enable docker
+Connectivity:
 
-                    #👉 yum install git -y
+VPC: default
 
-                    #👉 yum install mariadb105-server
+Subnet group: default or custom
 
-                    #👉 git clone https://github.com/Samir-CloudAwswithDevops/add-book-project-though-docker.git
+Security group: allow inbound port 3306 from EC2
 
-                    #👉 ls cd backend -inside #👉 vi test.sql inside # change rds <endpoint> password :wq!
+Public access: Yes
 
-                    #👉 cd backend inside -docker build -t backend .
+Click Create Database
 
-                    #👉 cd backend inside - MySQL -h <rds endponit> -u admin -P < test.sql
-                    passwotrd - Samir
-    
-                    # show books 
+🖥️ 2. Launch EC2 Instance
+👉 EC2 Configuration:
 
-                   #👉 cd backend inside - docker run -dt -p 84:80 backend .
- 
-                   #👉 cd backend inside - docker ps then  ## docker images
+Instance type: c7i.large (or your choice)
 
-                   ## copy public ip:84 hit browser show output hello
+Key pair: create/select existing
 
-                  #👉 cd client/src/pages/config.js ## change publicip:84
+Attach IAM Role: AmazonEC2FullAccess
 
-                  #👉 cd client inside - docker build -t frontend
+Security Group: allow inbound 22, 80, 82, 84
 
-                  #👉 cd client inside - docker run -dt -p 82:80 frontend 
+Connect using SSH
 
-                  #👉 cd client inside - docker ps then docker images
+🔧 3. Install Required Packages on EC2
+sudo su -
+yum install docker -y
+systemctl start docker
+systemctl enable docker
+yum install git -y
+yum install mariadb105-server -y
+📥 4. Clone Project
+git clone https://github.com/Samir-CloudAwswithDevops/add-book-project-though-docker.git
+cd add-book-project-though-docker/backend
 
-                  #👉 #### copy publicip:82 hit browser  ### 🎉 Deployment Complete!
+Edit SQL file:
+
+vi test.sql
+# replace <rds-endpoint> and password
+:wq!
+🛢️ 5. Import Database into RDS
+mysql -h <rds-endpoint> -u admin -p < test.sql
+# password: Samir
+
+Test:
+
+show databases;
+show tables;
+select * from books;
+🐳 6. Build & Run Backend Docker Container
+cd backend
+docker build -t backend .
+docker run -dt -p 84:80 backend
+
+Check:
+
+docker ps
+docker images
+
+Open in browser:
+
+http://<EC2-Public-IP>:84
+
+Should show: Hello
+
+🌐 7. Update Frontend Config
+cd ../client/src/pages
+vi config.js
+# update API URL → http://<EC2-Public-IP>:84
+:wq!
+🐳 8. Build & Run Frontend Docker Container
+cd ../../client
+docker build -t frontend .
+docker run -dt -p 82:80 frontend
+
+Check:
+
+docker ps
+docker images
+
+Open in browser:
+
+http://<EC2-Public-IP>:82
+
+🎉 Deployment Complete! Your Book App is Live.
  
